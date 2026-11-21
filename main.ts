@@ -93,11 +93,19 @@ if(!z){let n=C(U(s.r.R,new Set(s.r.G),s.e),s.e,s.r.D)
 if(n==null)return null
 O+=n,u=s.r.D}else u=s.e}
 return O}
-let a=process.argv[2],f=[]
-if(a)f=F.statSync(a).isDirectory()?F.readdirSync(a).filter(x=>x.toLowerCase().endsWith(".txt")).sort().map(x=>a+"/"+x):[a]
-else if(F.existsSync("level.txt"))f=["level.txt"]
-else if(F.existsSync("levels"))f=F.readdirSync("levels").filter(x=>x.toLowerCase().endsWith(".txt")).sort().map(x=>"levels/"+x)
+let I=process.env.MAKEFUN_INPUT_DIR||process.argv[2],O=process.env.MAKEFUN_OUTPUT_DIR||process.argv[3],f=[]
+let J=(d,id)=>{let m=L(F.readFileSync(d,"utf8"));if(m==null)m=""
+if(O){F.mkdirSync(O+"/"+id,{recursive:true});F.writeFileSync(O+"/"+id+"/solution.txt",m+"\n")}else process.stdout.write(m+"\n")}
+if(I&&F.statSync(I).isDirectory()){let s=F.readdirSync(I).sort()
+for(let x of s){let p=I+"/"+x
+if(F.statSync(p).isDirectory()&&F.existsSync(p+"/level.txt"))f.push([p+"/level.txt",x])
+else if(x.toLowerCase().endsWith(".txt"))f.push([p,x.replace(/\.txt$/i,"")])}
+if(!f.length&&F.existsSync(I+"/level.txt"))f=[[I+"/level.txt","i001"]]}
+else if(I)f=[[I,"i001"]]
+else if(F.existsSync("level.txt"))f=[["level.txt","i001"]]
+else if(F.existsSync("levels"))f=F.readdirSync("levels").filter(x=>x.toLowerCase().endsWith(".txt")).sort().map(x=>["levels/"+x,x.replace(/\.txt$/i,"")])
 if(!f.length)process.exit(1)
-let o=[]
-for(let x of f){let m=L(F.readFileSync(x,"utf8"));o.push(m==null?"":m)}
-process.stdout.write(o.join("\n")+"\n")
+if(!O){let o=[]
+for(let x of f){let m=L(F.readFileSync(x[0],"utf8"));o.push(m==null?"":m)}
+process.stdout.write(o.join("\n")+"\n")}
+else for(let x of f)J(x[0],x[1])
